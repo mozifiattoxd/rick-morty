@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rick and Morty Character Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .character-card {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 400px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .character-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rick and Morty Character Generator</h1>
+    <div class="character-card" id="character-card">
+        <p>Click the button to fetch a random character!</p>
+    </div>
+    <button class="btn" onclick="fetchRandomCharacter()">Get Random Character</button>
+
+    <script>
+        async function fetchRandomCharacter() {
+            const apiUrl = 'https://rickandmortyapi.com/api/character/';
+            
+            try {
+                // Get total characters
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch characters: ${response.status}`);
+                }
+                const data = await response.json();
+                const totalCharacters = data.info.count;
+
+                // Get a random character ID
+                const randomId = Math.floor(Math.random() * totalCharacters) + 1;
+
+                // Fetch character details
+                const characterResponse = await fetch(`${apiUrl}${randomId}`);
+                if (!characterResponse.ok) {
+                    throw new Error(`Failed to fetch character: ${characterResponse.status}`);
+                }
+                const character = await characterResponse.json();
+
+                // Display character information in the DOM
+                const characterCard = document.getElementById('character-card');
+                characterCard.innerHTML = `
+                    <h2>${character.name}</h2>
+                    <p><strong>Status:</strong> ${character.status}</p>
+                    <p><strong>Species:</strong> ${character.species}</p>
+                    <img src="${character.image}" alt="${character.name}">
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                const characterCard = document.getElementById('character-card');
+                characterCard.innerHTML = `<p>Failed to fetch character. Please try again.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
